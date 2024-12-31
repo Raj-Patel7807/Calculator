@@ -64,19 +64,38 @@ const handleSymboles = (symbol) => {
 };
 
 const handleNumbers = (numStr) => {
-    if(numStr === '.') {
-        if(!buffer.includes('.')) {
-            buffer += '.';
-        }
-    } else if(buffer === "0") {
+    if(buffer === "0" && numStr !== '.') {
         buffer = numStr;
-    } else {
-        buffer += numStr;
+    } else if(buffer.length < 12) {
+        if(numStr === '.') {
+            if(!buffer.includes('.')) {
+                buffer += '.';
+            }
+        } else {
+            buffer += numStr;
+        }
+    }
+};
+
+const highlightButton = (key) => {
+    const btn = document.querySelector(`button[id="${key}"]`);
+
+    if(btn) {
+        btn.classList.add("active");
+    }
+};
+
+const dehighlightButton = (key) => {
+    const btn = document.querySelector(`button[id="${key}"]`);
+
+    if(btn) {
+        btn.classList.remove("active");
     }
 };
 
 btns.forEach((btn) => {
     btn.addEventListener("click", () => {
+
         let val = btn.getAttribute("id");
 
         if(isNaN(val) && val !== '.') {
@@ -87,4 +106,71 @@ btns.forEach((btn) => {
 
         mainScreen.innerText = buffer;  
     });
+
+    btn.addEventListener("mousedown", () => {
+        btn.classList.add("active");
+    });
+
+    btn.addEventListener("mouseup", () => {
+        btn.classList.remove("active");
+    });
+
+    btn.addEventListener("mouseout", () => {
+        btn.classList.remove("active");
+    });
+});
+
+document.addEventListener("keydown", (event) => {
+    const key = event.key;
+
+    event.preventDefault();
+
+    if(!isNaN(key) || key === '.') {
+        handleNumbers(key);
+    } else if(['+', '*', '/'].includes(key)) {
+        handleMath(key);
+    } else if(key === '-') {
+        if(buffer === '0') {
+            handleSymboles('pm');
+        } else {
+            handleMath(key);
+        }
+    } else if(key === "Enter" || key === '=') {
+        handleSymboles('=');
+    } else if(key === "Backspace") {
+        handleSymboles("larr");
+    } else if(key === 'c' || key === 'C') {
+        handleSymboles('C');
+    }
+
+    mainScreen.innerText = buffer;
+    operatorScreen.innerText = operator || "";
+});
+
+document.addEventListener("keydown", (event) => {
+    let key = event.key;
+
+    if(key === "Enter") {
+        key = '=';
+    } else if(key === "Backspace") {
+        key = "larr";
+    } else if(key === 'c') {
+        key = 'C';
+    }
+
+    highlightButton(key);
+});
+
+document.addEventListener("keyup", (event) => {
+    let key = event.key;
+
+    if(key === "Enter") {
+        key = '=';
+    } else if(key === "Backspace") {
+        key = "larr";
+    } else if(key === 'c') {
+        key = 'C';
+    }
+
+    dehighlightButton(key);
 });
