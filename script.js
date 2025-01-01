@@ -58,6 +58,10 @@ const handleSymboles = (symbol) => {
         }
     } else if(symbol === 'pm') {
         buffer = (parseFloat(buffer) * (-1)).toString();
+    } else if(symbol === '%') {
+        if(operator && buffer !== '0') {
+            buffer = (runningTotal * (parseFloat(buffer) / 100)).toString();
+        }
     } else {
         handleMath(symbol);
     }
@@ -135,6 +139,8 @@ document.addEventListener("keydown", (event) => {
         } else {
             handleMath(key);
         }
+    } else if(key == '%') {
+        handleSymboles('%');
     } else if(key === "Enter" || key === '=') {
         handleSymboles('=');
     } else if(key === "Backspace") {
